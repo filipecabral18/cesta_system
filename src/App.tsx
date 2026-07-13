@@ -5,6 +5,7 @@ import LoginPage from './features/auth/LoginPage'
 import { useAuth } from './features/auth/useAuth'
 import DespensaPage from './features/despensa/DespensaPage'
 import ListasPage from './features/listas/ListasPage'
+import NovaListaPage from './features/listas/NovaListaPage'
 
 export default function App() {
   const { session, carregando } = useAuth()
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/" element={<Navigate to="/despensa" replace />} />
           <Route path="/despensa" element={<DespensaPage />} />
           <Route path="/listas" element={<ListasPage />} />
+          <Route path="/listas/nova" element={<NovaListaPage />} />
           <Route path="*" element={<Navigate to="/despensa" replace />} />
         </Routes>
       </main>
