@@ -49,21 +49,23 @@ export default function ListasPage() {
       {listas && listas.length > 0 && (
         <ul className="space-y-2">
           {listas.map((lista) => (
-            <li
-              key={lista.id}
-              className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3"
-            >
-              <div className="min-w-0">
-                <p className="truncate font-medium">{lista.nome}</p>
-                <p className="text-xs text-gray-400">
-                  {formatarData(lista.created_at)}
-                </p>
-              </div>
-              <span
-                className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[lista.status]}`}
+            <li key={lista.id}>
+              <Link
+                to={`/listas/${lista.id}`}
+                className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 hover:bg-gray-50"
               >
-                {STATUS_LABEL[lista.status]}
-              </span>
+                <div className="min-w-0">
+                  <p className="truncate font-medium">{lista.nome}</p>
+                  <p className="text-xs text-gray-400">
+                    {formatarData(lista.created_at)}
+                  </p>
+                </div>
+                <span
+                  className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[lista.status]}`}
+                >
+                  {STATUS_LABEL[lista.status]}
+                </span>
+              </Link>
             </li>
           ))}
         </ul>
