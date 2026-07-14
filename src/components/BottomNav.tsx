@@ -7,7 +7,7 @@ const itens = [
 
 export default function BottomNav() {
   return (
-    <nav className="fixed inset-x-0 bottom-0 mx-auto max-w-md border-t border-gray-200 bg-white">
+    <nav className="fixed inset-x-0 bottom-0 mx-auto max-w-md border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom)]">
       <ul className="flex">
         {itens.map((item) => (
           <li key={item.to} className="flex-1">

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Cesta">
+  <defs>
+    <clipPath id="corpo">
+      <path d="M150 214 h212 l-20 150 a24 24 0 0 1 -23.8 21 H193.8 a24 24 0 0 1 -23.8 -21 Z" />
+    </clipPath>
+  </defs>
+
+  <!-- fundo verde (full-bleed, seguro para ícone maskable) -->
+  <rect width="512" height="512" fill="#16a34a" />
+
+  <!-- alça -->
+  <path d="M182 218 a74 74 0 0 1 148 0" fill="none" stroke="#ffffff"
+        stroke-width="20" stroke-linecap="round" />
+
+  <!-- corpo da cesta -->
+  <path d="M150 214 h212 l-20 150 a24 24 0 0 1 -23.8 21 H193.8 a24 24 0 0 1 -23.8 -21 Z"
+        fill="#ffffff" />
+
+  <!-- trançado (recortado para dentro do corpo) -->
+  <g clip-path="url(#corpo)" stroke="#16a34a" stroke-width="12" fill="none" stroke-linecap="round">
+    <path d="M210 208 l-14 176" />
+    <path d="M256 208 l0 178" />
+    <path d="M302 208 l14 176" />
+    <path d="M138 262 h236" />
+    <path d="M144 314 h224" />
+  </g>
+
+  <!-- borda superior -->
+  <rect x="138" y="196" width="236" height="28" rx="14" fill="#ffffff" />
+</svg>
