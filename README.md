@@ -27,6 +27,17 @@ npm run dev
 | `npm run typecheck` | Checagem de tipos (TypeScript)   |
 | `npm run lint`      | Lint (ESLint)                    |
 
+## Deploy (Vercel)
+
+O projeto é um SPA estático servido pela Vercel (preset **Vite**). O
+`vercel.json` faz o rewrite de todas as rotas para `index.html`, para que URLs
+profundas (ex.: `/listas/:id`) funcionem ao recarregar.
+
+Variáveis de ambiente a configurar no painel da Vercel:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
 ## Documentação
 
 - `CLAUDE.md` — visão do projeto, modelo de dados e convenções.
