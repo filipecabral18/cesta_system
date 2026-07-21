@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 
 const itens = [
+  { to: '/itens', label: 'Itens', icone: '🏷️' },
   { to: '/despensa', label: 'Despensa', icone: '🧺' },
   { to: '/listas', label: 'Listas', icone: '📝' },
 ]

@@ -1,51 +1,45 @@
-import { useState } from 'react'
-import { CATEGORIAS, CATEGORIA_LABELS } from '@/types'
-import { useProdutos } from './useProdutos'
-import ProdutoRow from './ProdutoRow'
-import ProdutoFormModal from './ProdutoFormModal'
+import { Link } from 'react-router-dom';
+import { CATEGORIAS, CATEGORIA_LABELS } from '@/types';
+import { useDespensa } from './useDespensa';
+import ProdutoRow from './ProdutoRow';
 
 export default function DespensaPage() {
-  const { data: produtos, isLoading, isError } = useProdutos()
-  const [modalAberto, setModalAberto] = useState(false)
+  const { data: produtos, isLoading, isError } = useDespensa();
 
   return (
     <section className="p-4">
-      <header className="mb-4 flex items-start justify-between gap-2">
-        <div>
-          <h1 className="text-2xl font-bold">Despensa</h1>
-          <p className="text-sm text-gray-500">
-            Catálogo de produtos com quantidades de referência.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => setModalAberto(true)}
-          className="shrink-0 rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700"
-        >
-          + Novo
-        </button>
+      <header className="mb-4">
+        <h1 className="text-2xl font-bold">Minha Despensa</h1>
+        <p className="text-sm text-gray-500">
+          Ajuste a quantidade de referência de cada item.
+        </p>
       </header>
 
-      {isLoading && <p className="text-sm text-gray-400">Carregando produtos…</p>}
+      {isLoading && (
+        <p className="text-sm text-gray-400">Carregando despensa…</p>
+      )}
 
       {isError && (
         <p className="text-sm text-red-600">
-          Não foi possível carregar os produtos.
+          Não foi possível carregar a despensa.
         </p>
       )}
 
       {produtos && produtos.length === 0 && (
         <div className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm text-gray-400">
-          Nenhum produto ainda. Toque em <strong>+ Novo</strong> para começar a
-          montar sua despensa.
+          Nenhum item ainda. Cadastre itens na aba{' '}
+          <Link to="/itens" className="font-medium text-green-600">
+            Itens
+          </Link>{' '}
+          para montar sua despensa.
         </div>
       )}
 
       {produtos && produtos.length > 0 && (
         <div className="space-y-4">
           {CATEGORIAS.map((categoria) => {
-            const doGrupo = produtos.filter((p) => p.categoria === categoria)
-            if (doGrupo.length === 0) return null
+            const doGrupo = produtos.filter((p) => p.categoria === categoria);
+            if (doGrupo.length === 0) return null;
 
             return (
               <div key={categoria}>
@@ -58,15 +52,10 @@ export default function DespensaPage() {
                   ))}
                 </ul>
               </div>
-            )
+            );
           })}
         </div>
       )}
-
-      <ProdutoFormModal
-        aberto={modalAberto}
-        onFechar={() => setModalAberto(false)}
-      />
     </section>
-  )
+  );
 }

@@ -11,13 +11,14 @@ o outro vê na hora.
 
 ## Funcionalidades (MVP)
 
-1. **Despensa**: cadastrar produtos com nome, categoria, unidade e quantidade de referência.
-2. **Criar lista — modo vazio**: usuário seleciona produtos e quantidades manualmente.
-3. **Criar lista — modo referência**: lista nasce pré-preenchida com as quantidades de
+1. **Itens (cadastro)**: cadastrar/editar/excluir itens com nome, categoria e unidade.
+2. **Despensa**: definir a quantidade de referência de cada item cadastrado.
+3. **Criar lista — modo vazio**: usuário seleciona produtos e quantidades manualmente.
+4. **Criar lista — modo referência**: lista nasce pré-preenchida com as quantidades de
    referência da despensa; usuário ajusta antes de salvar.
-4. **Modo compra**: dentro de uma lista, marcar itens como comprados (checkbox), com
+5. **Modo compra**: dentro de uma lista, marcar itens como comprados (checkbox), com
    sincronização em tempo real entre os dois usuários.
-5. **Autenticação**: login por e-mail/senha via Supabase Auth. Os dados são compartilhados
+6. **Autenticação**: login por e-mail/senha via Supabase Auth. Os dados são compartilhados
    entre os dois usuários (conceito de "casa" única no MVP).
 
 ### Fora do MVP (v2 — não implementar sem pedido explícito)
@@ -39,7 +40,11 @@ o outro vê na hora.
 ## Modelo de dados (Postgres / Supabase)
 
 - `produtos`: id, nome, categoria (enum: hortifruti, mercearia, limpeza, higiene, bebidas,
-  outros), unidade (un, kg, g, l, ml, pacote), quantidade_referencia (numeric), created_at
+  outros), unidade (un, kg, g, l, ml, pacote), created_at. É o **catálogo puro** (a
+  definição do item); cadastrado/editado/excluído na aba **Itens**.
+- `despensa`: produto_id (PK e FK → produtos, on delete cascade), quantidade_referencia
+  (numeric), updated_at. Guarda a **quantidade de referência** de cada item (1 linha por
+  produto); editada na aba **Despensa**. É o que alimenta o "modo referência" das listas.
 - `listas`: id, nome, status (aberta | concluida), modo_criacao (vazia | referencia),
   created_at
 - `itens_lista`: id, lista_id (FK), produto_id (FK), quantidade (numeric),
@@ -54,7 +59,8 @@ lê e escreve tudo. Realtime habilitado em `itens_lista`.
 src/
 ├── components/     # UI reutilizável (Button, Card, Input, BottomNav...)
 ├── features/
-│   ├── despensa/
+│   ├── cadastro/    # catálogo de itens (criar/editar/excluir)
+│   ├── despensa/    # quantidade de referência de cada item
 │   ├── listas/
 │   └── compra/
 ├── lib/            # supabaseClient.ts, helpers
