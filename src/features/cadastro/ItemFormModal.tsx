@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import {
   CATEGORIAS,
   CATEGORIA_LABELS,
@@ -6,60 +6,61 @@ import {
   UNIDADE_LABELS,
   produtoFormSchema,
   type Categoria,
+  type Produto,
   type Unidade,
 } from '@/types'
-import { useCriarProduto } from './useProdutos'
+import { useAtualizarProduto, useCriarProduto } from './useProdutos'
 
 interface Props {
   aberto: boolean
   onFechar: () => void
+  // Quando presente, o modal edita esse item; ausente, cadastra um novo.
+  produto?: Produto | null
 }
 
-export default function ProdutoFormModal({ aberto, onFechar }: Props) {
+export default function ItemFormModal({ aberto, onFechar, produto }: Props) {
   const criar = useCriarProduto()
+  const atualizar = useAtualizarProduto()
+  const editando = Boolean(produto)
 
   const [nome, setNome] = useState('')
   const [categoria, setCategoria] = useState<Categoria>('mercearia')
   const [unidade, setUnidade] = useState<Unidade>('un')
-  const [quantidade, setQuantidade] = useState('1')
   const [erro, setErro] = useState<string | null>(null)
+
+  // Ao abrir, preenche o formulário com os dados do item (edição) ou com os
+  // padrões (novo). Depende de `aberto` para "resetar" a cada abertura.
+  useEffect(() => {
+    if (!aberto) return
+    setNome(produto?.nome ?? '')
+    setCategoria(produto?.categoria ?? 'mercearia')
+    setUnidade(produto?.unidade ?? 'un')
+    setErro(null)
+  }, [aberto, produto])
 
   if (!aberto) return null
 
-  function resetar() {
-    setNome('')
-    setCategoria('mercearia')
-    setUnidade('un')
-    setQuantidade('1')
-    setErro(null)
-  }
-
-  function fechar() {
-    resetar()
-    onFechar()
-  }
+  const salvando = criar.isPending || atualizar.isPending
 
   function handleSubmit(evento: FormEvent) {
     evento.preventDefault()
     setErro(null)
 
-    // Valida com Zod (o campo quantidade é string do input e vira número).
-    const dados = produtoFormSchema.safeParse({
-      nome,
-      categoria,
-      unidade,
-      quantidade_referencia: quantidade,
-    })
+    const dados = produtoFormSchema.safeParse({ nome, categoria, unidade })
     if (!dados.success) {
       setErro(dados.error.issues[0].message)
       return
     }
 
-    criar.mutate(dados.data, {
-      onSuccess: fechar,
-      onError: (err) =>
-        setErro(err instanceof Error ? err.message : 'Erro ao salvar o produto.'),
-    })
+    const onSuccess = () => onFechar()
+    const onError = (err: unknown) =>
+      setErro(err instanceof Error ? err.message : 'Erro ao salvar o item.')
+
+    if (produto) {
+      atualizar.mutate({ id: produto.id, dados: dados.data }, { onSuccess, onError })
+    } else {
+      criar.mutate(dados.data, { onSuccess, onError })
+    }
   }
 
   const campoClasse =
@@ -68,13 +69,15 @@ export default function ProdutoFormModal({ aberto, onFechar }: Props) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4"
-      onClick={fechar}
+      onClick={onFechar}
     >
       <div
         className="w-full max-w-md rounded-t-2xl bg-white p-5 shadow-lg sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-4 text-lg font-bold">Novo produto</h2>
+        <h2 className="mb-4 text-lg font-bold">
+          {editando ? 'Editar item' : 'Novo item'}
+        </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>
@@ -129,22 +132,6 @@ export default function ProdutoFormModal({ aberto, onFechar }: Props) {
             </div>
           </div>
 
-          <div>
-            <label htmlFor="quantidade" className="mb-1 block text-sm font-medium">
-              Quantidade de referência
-            </label>
-            <input
-              id="quantidade"
-              type="number"
-              inputMode="decimal"
-              min={0}
-              step="any"
-              value={quantidade}
-              onChange={(e) => setQuantidade(e.target.value)}
-              className={campoClasse}
-            />
-          </div>
-
           {erro && (
             <p className="text-sm text-red-600" role="alert">
               {erro}
@@ -154,17 +141,17 @@ export default function ProdutoFormModal({ aberto, onFechar }: Props) {
           <div className="flex gap-3 pt-1">
             <button
               type="button"
-              onClick={fechar}
+              onClick={onFechar}
               className="flex-1 rounded-lg border border-gray-300 py-2.5 font-medium text-gray-700 hover:bg-gray-50"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              disabled={criar.isPending}
+              disabled={salvando}
               className="flex-1 rounded-lg bg-green-600 py-2.5 font-medium text-white hover:bg-green-700 disabled:opacity-60"
             >
-              {criar.isPending ? 'Salvando…' : 'Salvar'}
+              {salvando ? 'Salvando…' : 'Salvar'}
             </button>
           </div>
         </form>

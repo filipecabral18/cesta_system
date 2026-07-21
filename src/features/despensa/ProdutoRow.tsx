@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { UNIDADE_LABELS, type Produto } from '@/types'
-import { useAtualizarQuantidadeReferencia } from './useProdutos'
+import { UNIDADE_LABELS, type ProdutoComReferencia } from '@/types'
+import { useDefinirReferencia } from './useDespensa'
 
 // Uma linha da despensa. A quantidade de referência é editável no próprio
 // campo: o valor é confirmado ao sair do campo (blur) ou ao apertar Enter.
-export default function ProdutoRow({ produto }: { produto: Produto }) {
-  const atualizar = useAtualizarQuantidadeReferencia()
+export default function ProdutoRow({ produto }: { produto: ProdutoComReferencia }) {
+  const definir = useDefinirReferencia()
   const [valor, setValor] = useState(String(produto.quantidade_referencia))
 
   function confirmar() {
@@ -17,7 +17,7 @@ export default function ProdutoRow({ produto }: { produto: Produto }) {
     }
     // Só salva se realmente mudou (evita chamadas desnecessárias).
     if (numero !== produto.quantidade_referencia) {
-      atualizar.mutate({ id: produto.id, quantidade_referencia: numero })
+      definir.mutate({ produto_id: produto.id, quantidade_referencia: numero })
     }
   }
 
@@ -36,7 +36,7 @@ export default function ProdutoRow({ produto }: { produto: Produto }) {
           onKeyDown={(e) => {
             if (e.key === 'Enter') e.currentTarget.blur()
           }}
-          disabled={atualizar.isPending}
+          disabled={definir.isPending}
           className="w-16 rounded-md border border-gray-300 px-2 py-1 text-right focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 disabled:opacity-60"
         />
         <span className="w-10 text-sm text-gray-500">

@@ -22,7 +22,6 @@ export interface Database {
           nome: string
           categoria: Categoria
           unidade: Unidade
-          quantidade_referencia: number
           created_at: string
         }
         Insert: {
@@ -30,7 +29,6 @@ export interface Database {
           nome: string
           categoria: Categoria
           unidade: Unidade
-          quantidade_referencia?: number
           created_at?: string
         }
         Update: {
@@ -38,10 +36,34 @@ export interface Database {
           nome?: string
           categoria?: Categoria
           unidade?: Unidade
-          quantidade_referencia?: number
           created_at?: string
         }
         Relationships: []
+      }
+      despensa: {
+        Row: {
+          produto_id: string
+          quantidade_referencia: number
+          updated_at: string
+        }
+        Insert: {
+          produto_id: string
+          quantidade_referencia?: number
+          updated_at?: string
+        }
+        Update: {
+          produto_id?: string
+          quantidade_referencia?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'despensa_produto_id_fkey'
+            columns: ['produto_id']
+            referencedRelation: 'produtos'
+            referencedColumns: ['id']
+          },
+        ]
       }
       listas: {
         Row: {
@@ -120,6 +142,12 @@ export interface Database {
 // Atalhos usados pelo resto do app.
 export type Produto = Database['public']['Tables']['produtos']['Row']
 export type ProdutoInsert = Database['public']['Tables']['produtos']['Insert']
+export type ProdutoUpdate = Database['public']['Tables']['produtos']['Update']
+export type Despensa = Database['public']['Tables']['despensa']['Row']
+export type DespensaInsert = Database['public']['Tables']['despensa']['Insert']
+// Produto do catálogo já com a quantidade de referência da despensa embutida —
+// o formato que a tela da Despensa e a montagem de listas consomem.
+export type ProdutoComReferencia = Produto & { quantidade_referencia: number }
 export type Lista = Database['public']['Tables']['listas']['Row']
 export type ListaInsert = Database['public']['Tables']['listas']['Insert']
 export type ItemLista = Database['public']['Tables']['itens_lista']['Row']

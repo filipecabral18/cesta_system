@@ -6,7 +6,7 @@ import {
   UNIDADE_LABELS,
   type ModoCriacao,
 } from '@/types'
-import { useProdutos } from '../despensa/useProdutos'
+import { useDespensa } from '../despensa/useDespensa'
 import { useCriarLista } from './useListas'
 
 // Estado de cada produto na tela de montagem: se entra na lista e com que
@@ -18,7 +18,7 @@ interface LinhaEstado {
 
 export default function NovaListaPage() {
   const navigate = useNavigate()
-  const { data: produtos, isLoading } = useProdutos()
+  const { data: produtos, isLoading } = useDespensa()
   const criar = useCriarLista()
 
   const [nome, setNome] = useState('')
@@ -114,9 +114,9 @@ export default function NovaListaPage() {
       <section className="p-4">
         <h1 className="mb-2 text-2xl font-bold">Nova lista</h1>
         <div className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm text-gray-400">
-          Cadastre produtos na{' '}
-          <Link to="/despensa" className="font-medium text-green-600">
-            Despensa
+          Cadastre itens na aba{' '}
+          <Link to="/itens" className="font-medium text-green-600">
+            Itens
           </Link>{' '}
           antes de criar uma lista.
         </div>
