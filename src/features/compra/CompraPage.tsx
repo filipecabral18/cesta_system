@@ -47,6 +47,14 @@ function CompraDetalhe({ listaId }: { listaId: string }) {
               Concluída
             </span>
           )}
+          {lista?.status === 'aberta' && (
+            <Link
+              to={`/listas/${listaId}/editar`}
+              className="shrink-0 rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
+            >
+              Editar
+            </Link>
+          )}
         </div>
       </header>
 
