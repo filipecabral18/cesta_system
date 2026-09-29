@@ -133,3 +133,22 @@ export function useConcluirLista(listaId: string) {
     },
   })
 }
+
+// ── Reabrir uma lista concluída ──────────────────────────────────────────────
+export function useReabrirLista(listaId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('listas')
+        .update({ status: 'aberta' })
+        .eq('id', listaId)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: LISTA_KEY(listaId) })
+      queryClient.invalidateQueries({ queryKey: ['listas'] })
+    },
+  })
+}
