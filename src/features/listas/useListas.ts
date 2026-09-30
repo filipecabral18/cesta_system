@@ -64,3 +64,87 @@ export function useCriarLista() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: LISTAS_KEY }),
   })
 }
+
+// ── Escrita: editar lista aberta (nome + itens) ──────────────────────────────
+export interface EditarListaInput {
+  nome: string
+  itens: Array<{ produto_id: string; quantidade: number }>
+}
+
+export function useEditarLista(listaId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (input: EditarListaInput): Promise<void> => {
+      // O outro usuário pode ter concluído a lista durante a edição.
+      const { data: lista, error: erroLista } = await supabase
+        .from('listas')
+        .select('status')
+        .eq('id', listaId)
+        .single()
+      if (erroLista) throw erroLista
+      if (lista.status !== 'aberta') {
+        throw new Error('Esta lista já foi concluída e não pode ser editada.')
+      }
+
+      const { error: erroNome } = await supabase
+        .from('listas')
+        .update({ nome: input.nome })
+        .eq('id', listaId)
+      if (erroNome) throw erroNome
+
+      // Aplica só a diferença, para os itens mantidos preservarem o "comprado".
+      const { data: atuais, error: erroAtuais } = await supabase
+        .from('itens_lista')
+        .select('id, produto_id, quantidade')
+        .eq('lista_id', listaId)
+      if (erroAtuais) throw erroAtuais
+
+      const desejados = new Map(
+        input.itens.map((i) => [i.produto_id, i.quantidade]),
+      )
+      const produtosAtuais = new Set(atuais.map((i) => i.produto_id))
+
+      const idsRemover = atuais
+        .filter((item) => !desejados.has(item.produto_id))
+        .map((item) => item.id)
+      const alterar = atuais.flatMap((item) => {
+        const quantidade = desejados.get(item.produto_id)
+        return quantidade !== undefined && quantidade !== item.quantidade
+          ? [{ id: item.id, quantidade }]
+          : []
+      })
+      const inserir = input.itens.filter(
+        (i) => !produtosAtuais.has(i.produto_id),
+      )
+
+      if (idsRemover.length > 0) {
+        const { error } = await supabase
+          .from('itens_lista')
+          .delete()
+          .in('id', idsRemover)
+        if (error) throw error
+      }
+
+      const resultados = await Promise.all(
+        alterar.map(({ id, quantidade }) =>
+          supabase.from('itens_lista').update({ quantidade }).eq('id', id),
+        ),
+      )
+      const erroAlterar = resultados.find((r) => r.error)?.error
+      if (erroAlterar) throw erroAlterar
+
+      if (inserir.length > 0) {
+        const { error } = await supabase
+          .from('itens_lista')
+          .insert(inserir.map((i) => ({ ...i, lista_id: listaId })))
+        if (error) throw error
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: LISTAS_KEY })
+      queryClient.invalidateQueries({ queryKey: ['lista', listaId] })
+      queryClient.invalidateQueries({ queryKey: ['itens_lista', listaId] })
+    },
+  })
+}

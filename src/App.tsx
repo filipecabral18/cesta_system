@@ -7,6 +7,7 @@ import CadastroPage from './features/cadastro/CadastroPage';
 import DespensaPage from './features/despensa/DespensaPage';
 import ListasPage from './features/listas/ListasPage';
 import NovaListaPage from './features/listas/NovaListaPage';
+import EditarListaPage from './features/listas/EditarListaPage';
 import CompraPage from './features/compra/CompraPage';
 
 export default function App() {
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="/listas" element={<ListasPage />} />
           <Route path="/listas/nova" element={<NovaListaPage />} />
           <Route path="/listas/:id" element={<CompraPage />} />
+          <Route path="/listas/:id/editar" element={<EditarListaPage />} />
           <Route path="*" element={<Navigate to="/despensa" replace />} />
         </Routes>
       </main>

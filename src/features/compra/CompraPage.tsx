@@ -7,6 +7,7 @@ import {
   useLista,
   useMarcarComprado,
   useRealtimeItens,
+  useReabrirLista,
 } from './useCompra'
 
 export default function CompraPage() {
@@ -20,6 +21,7 @@ function CompraDetalhe({ listaId }: { listaId: string }) {
   const { data: itens, isLoading, isError } = useItensLista(listaId)
   const marcar = useMarcarComprado(listaId)
   const concluir = useConcluirLista(listaId)
+  const reabrir = useReabrirLista(listaId)
 
   // Liga a sincronização em tempo real desta lista.
   useRealtimeItens(listaId)
@@ -46,6 +48,14 @@ function CompraDetalhe({ listaId }: { listaId: string }) {
             <span className="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
               Concluída
             </span>
+          )}
+          {lista?.status === 'aberta' && (
+            <Link
+              to={`/listas/${listaId}/editar`}
+              className="shrink-0 rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
+            >
+              Editar
+            </Link>
           )}
         </div>
       </header>
@@ -134,6 +144,18 @@ function CompraDetalhe({ listaId }: { listaId: string }) {
               className="mt-6 w-full rounded-lg bg-green-600 py-3 font-medium text-white hover:bg-green-700 disabled:opacity-60"
             >
               {concluir.isPending ? 'Concluindo…' : 'Concluir lista'}
+            </button>
+          )}
+
+          {/* Reabrir lista concluída */}
+          {lista?.status === 'concluida' && (
+            <button
+              type="button"
+              onClick={() => reabrir.mutate()}
+              disabled={reabrir.isPending}
+              className="mt-6 w-full rounded-lg border border-gray-300 py-3 font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+            >
+              {reabrir.isPending ? 'Reabrindo…' : 'Reabrir lista'}
             </button>
           )}
         </>
